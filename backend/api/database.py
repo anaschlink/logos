@@ -1,10 +1,23 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy import create_engine, event
+from sqlalchemy.orm import sessionmaker, DeclarativeBase
 
-from app.config import settings
+from api.config import settings
 
+connect_args = {}
 
-engine = create_engine(settings.database_url)
+if settings.database_url.startswith("sqlite"):
+    connect_args = {"check_same_thread": False, "timeout": 5}
+
+engine = create_engine(settings.database_url, connect_args=connect_args)
+
+@event.listens_for(engine, "connect")
+def _sqlite_pragmas(dbapi_conn, _):
+    if settings.database_url.startswith("sqlite"):
+        cur = dbapi_conn.cursor()
+        cur.execute("PRAGMA journal_mode=WAL")
+        cur.execute("PRAGMA busy_timeout=5000")
+        cur.close()
+
 
 SessionLocal = sessionmaker(
     autocommit=False,
@@ -12,8 +25,8 @@ SessionLocal = sessionmaker(
     bind=engine,
 )
 
-Base = declarative_base()
-
+class Base(DeclarativeBase):
+    pass
 
 def get_db():
     db = SessionLocal()
