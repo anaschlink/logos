@@ -2,9 +2,20 @@ from datetime import datetime, timezone
 
 from sqlalchemy import Integer, String, DateTime, Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column
-
+from sqlalchemy.types import TypeDecorator
 from api.database import Base
 from api.enums import Category, Severity, IncidentStatus
+
+class UTCDateTime(TypeDecorator):
+    impl = DateTime
+    cache_ok = True
+
+    def process_bind_param(self, value, dialect):
+        return value.astimezone(timezone.utc).replace(tzinfo=None)if value else value
+
+    def process_result_value(self, value, dialect):
+        return value.astimezone(timezone.utc).replace(tzinfo=None) if value else value
+
 
 class Incident(Base):
     __tablename__ = "incident"
@@ -14,17 +25,25 @@ class Incident(Base):
     )
 
     category: Mapped[Category] = mapped_column(
-        SAEnum(Category, name="incident_category", native_enum=False),
-        nullable=False,
+        SAEnum(Category, 
+                name="incident_category",
+                native_enum=False,
+                values_callable=lambda e: [m.value for m in e]),
+        nullable=False, 
     )
 
     severity: Mapped[Severity] = mapped_column(
-        SAEnum(Severity, name="incident_severity", native_enum=False),
+        SAEnum(Severity, 
+                name="incident_severity",
+                native_enum=False,
+                values_callable=lambda e: [m.value for m in e]),
         nullable=False,
     )
 
     status: Mapped[IncidentStatus] = mapped_column(
-        SAEnum(IncidentStatus, name="incident_status", native_enum=False),
+        SAEnum(IncidentStatus, 
+               name="incident_status",                  native_enum=False,
+               values_callable=lambda e: [m.value for m in e]),
         nullable=False,
     )
 
@@ -38,13 +57,13 @@ class Incident(Base):
     )
 
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
+        UTCDateTime(),
         default=lambda: datetime.now(timezone.utc),
         nullable=False,
     )
 
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
+        UTCDateTime(),
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
         nullable=False,
