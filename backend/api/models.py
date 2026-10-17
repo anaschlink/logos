@@ -14,7 +14,7 @@ class UTCDateTime(TypeDecorator):
         return value.astimezone(timezone.utc).replace(tzinfo=None)if value else value
 
     def process_result_value(self, value, dialect):
-        return value.astimezone(timezone.utc).replace(tzinfo=None) if value else value
+        return value.replace(tzinfo=timezone.utc) if value else value
 
 
 class Incident(Base):
@@ -49,8 +49,8 @@ class Incident(Base):
 
     title: Mapped[str] = mapped_column(String(120), nullable=False)
     description: Mapped[str] = mapped_column(String(2000), nullable=False)
-    location: Mapped[str] = mapped_column(String, nullable=False)
-    vehicle_id: Mapped[str] = mapped_column(String, nullable=False)
+    location: Mapped[str] = mapped_column(String(200), nullable=False)
+    vehicle_id: Mapped[str] = mapped_column(String(50), nullable=False)
 
     assigned_to: Mapped[str | None] = mapped_column(
         String, nullable=True
