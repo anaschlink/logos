@@ -142,7 +142,7 @@ def main() -> None:
         inserted = seed_incidents(db)
 
         if inserted:
-            print("Seed concluído: {inserted} incidents inseridos")
+            print(f"Seed concluído: {inserted} incidents inseridos")
         else:
             print("Seed ignorado: a tabela já contém incidents")
     finally:
