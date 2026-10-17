@@ -1,6 +1,7 @@
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict, Field
 from api.enums import Category, Severity, IncidentStatus
+from pydantic import BaseModel, ConfigDict, Field, computed_field, model_validator
+from api.transitions import allowed_targets
 
 class IncidentCreate(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
@@ -25,6 +26,16 @@ class IncidentUpdate(BaseModel):
     vehicle_id: str | None = Field(default=None, min_length=1, max_length=50)
     status: IncidentStatus | None = None
 
+    @model_validator(mode="after")
+    def _validate_sent_fields(self):
+        sent = self.model_fields_set - {"expected_version"}
+        if not sent:
+            raise ValueError("Informe ao menos um campo para alterar.")
+        nulls = sorted(f for f in sent if getattr(self, f) is None)
+        if nulls:
+            raise ValueError(f"Campos não aceitam null: {', '.join(nulls)}.")
+        return self
+
 class IncidentResponse(BaseModel):
     model_config=ConfigDict(from_attributes=True)
     
@@ -40,3 +51,13 @@ class IncidentResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
     version: int
+
+    @computed_field
+    @property
+    def allowed_transitions(self) -> list[IncidentStatus]:
+        return allowed_targets(self.status)
+
+
+class SummaryResponse(BaseModel):
+    total: int
+    by_severity: dict[Severity, int]
