@@ -1,0 +1,82 @@
+:root {
+  color-scheme: light;
+
+  /* Superfícies e texto */
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --surface-2: #eef0f3;
+  --border: #d9dde3;
+  --text: #14171c;
+  --text-muted: #5a6370;
+  --accent: #2457d6;
+  --accent-fg: #ffffff;
+  --focus: #2457d6;
+
+  /* Criticidade: barra (acento), fundo do badge, texto do badge */
+  --sev-alta: #d92d20;
+  --sev-alta-bg: #fee4e2;
+  --sev-alta-fg: #b42318;
+  --sev-media: #dc6803;
+  --sev-media-bg: #fef0c7;
+  --sev-media-fg: #93370d;
+  --sev-baixa: #1570ef;
+  --sev-baixa-bg: #d1e9ff;
+  --sev-baixa-fg: #175cd3;
+
+  /* Espaçamento (base 4px) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* Forma */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+
+  /* Tipografia: uma família só */
+  --font: "Inter Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-lg: 16px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+
+  /* Movimento */
+  --dur-fast: 150ms;
+  --dur: 200ms;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #0f1217;
+  --surface: #171b22;
+  --surface-2: #1f242d;
+  --border: #2d343f;
+  --text: #e7eaef;
+  --text-muted: #9aa3b0;
+  --accent: #6b9bff;
+  --accent-fg: #0f1217;
+  --focus: #6b9bff;
+
+  --sev-alta: #f97066;
+  --sev-alta-bg: #3b1512;
+  --sev-alta-fg: #fda29b;
+  --sev-media: #fdb022;
+  --sev-media-bg: #3a2a0a;
+  --sev-media-fg: #fec84b;
+  --sev-baixa: #53b1fd;
+  --sev-baixa-bg: #0f2a4a;
+  --sev-baixa-fg: #84caff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms;
+    --dur: 0ms;
+  }
+}
