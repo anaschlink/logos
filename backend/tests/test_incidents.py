@@ -1,4 +1,8 @@
 from tests.conftest import ANA, CARLOS, PAYLOAD
+from sqlalchemy.exc import OperationalError
+from sqlalchemy.orm import Session
+
+
 
 def patch(client, incident, headers=ANA, **fields):
     return client.patch(
@@ -125,3 +129,18 @@ def test_only_assignee_can_close(client, make):
     by_ana = patch(client, claimed, status="Fechado")
     assert by_ana.status_code == 200
     assert by_ana.json()["status"] == "Fechado"
+
+
+
+def test_banco_indisponivel_devolve_503(client, monkeypatch):
+    def boom(*args, **kwargs):
+        raise OperationalError("SELECT 1", {}, Exception("database is locked"))
+
+    for name in ("execute", "scalars", "scalar", "get"):
+        monkeypatch.setattr(Session, name, boom)
+
+    r = client.get("/api/incidents")
+
+    assert r.status_code == 503
+    assert r.headers["Retry-After"] == "2"
+    assert r.json()["error"]["code"] == "database_unavailable"
