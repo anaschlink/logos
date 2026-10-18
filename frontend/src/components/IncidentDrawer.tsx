@@ -22,6 +22,13 @@ export function IncidentDrawer({ id, analyst, onClose }: Props) {
   const move = (status: Status) => incident && update.mutate({ incident, analyst, changes: { status } });
   const err = update.error;
 
+  const lockedByOther =
+  !!incident &&
+  incident.status === "Em Investigação" &&
+  incident.assigned_to !== null &&
+  incident.assigned_to !== analyst;
+
+
   return (
     <aside className="drawer" role="dialog" aria-label="Detalhes do incidente">
       <button className="btn" onClick={onClose}>Fechar ✕</button>
@@ -53,16 +60,22 @@ export function IncidentDrawer({ id, analyst, onClose }: Props) {
           )}
           {update.isPending && <p className="muted" aria-live="polite">Salvando…</p>}
 
-          <div className="actions">
-            {incident.allowed_transitions.map((s) => (
-              <button key={s} className="btn primary" disabled={update.isPending} onClick={() => move(s)}>
-                {actionLabel(incident.status, s)}
-              </button>
-            ))}
-            {incident.allowed_transitions.length === 0 && !update.isPending && (
-              <span className="muted">Nenhuma ação disponível neste status.</span>
-            )}
-          </div>
+          {lockedByOther ? (
+            <p className="muted" role="status">
+              Em investigação por {incident.assigned_to}. Só o responsável pode alterar.
+            </p>
+          ) : (
+            <div className="actions">
+              {incident.allowed_transitions.map((s) => (
+                <button key={s} className="btn primary" disabled={update.isPending} onClick={() => move(s)}>
+                  {actionLabel(incident.status, s)}
+                </button>
+              ))}
+              {incident.allowed_transitions.length === 0 && !update.isPending && (
+                <span className="muted">Nenhuma ação disponível neste status.</span>
+              )}
+            </div>
+          )}
         </div>
       )}
     </aside>
