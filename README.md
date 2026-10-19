@@ -2,7 +2,7 @@
 
 MVP de gestão de incidentes para frota de 5.000 caminhões.  
 **Demo:** https://logos-ixy9.onrender.com (cold start de 30–60 s no plano gratuito)  
-**Vídeo:** [link]
+**Vídeo:** https://www.youtube.com/watch?v=fAhuB0LCiuY
 
 ---
 
